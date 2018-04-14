@@ -20,13 +20,16 @@ public interface QuizDao {
     void insertAdventure(Adventure adventures, List<AdventureText> adventureTexts);
 
     @Insert
-    void insertQuestion(Question question, List<QuestionText> questionTexts);
+    long insertQuestion(Question qeustion);
+
+    @Insert
+    void insertTexts(List<QuestionText> questionTexts);
 
     @Update
     void updateQuestion(Question question);
 
     @Query("SELECT * FROM questions" +
-            " INNER JOIN question_texts ON question_texts.questionId = questions.id" +
+            " INNER JOIN question_texts ON question_texts.question_id = questions.id" +
             " WHERE question_texts.languageId = :languageId" +
             " AND questions.adventureId = :adventureId" +
             " ORDER BY questions.`order`" +

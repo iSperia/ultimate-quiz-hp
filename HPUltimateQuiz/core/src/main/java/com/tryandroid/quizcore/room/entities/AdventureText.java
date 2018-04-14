@@ -8,7 +8,7 @@ import android.arch.persistence.room.PrimaryKey;
 public class AdventureText {
 
     @PrimaryKey(autoGenerate = true)
-    public int id;
+    public long id;
 
     @ForeignKey(entity = Adventure.class,
                 childColumns = "adventure_id",

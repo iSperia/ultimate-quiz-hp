@@ -8,7 +8,7 @@ import android.arch.persistence.room.PrimaryKey;
 public class Question {
 
     @PrimaryKey(autoGenerate = true)
-    public int id;
+    public long id;
 
     public int complexity;
 

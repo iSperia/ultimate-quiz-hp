@@ -1,19 +1,23 @@
 package com.tryandroid.quizcore.room.entities;
 
+import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
+import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 
-@Entity(tableName = "question_texts")
+@Entity(tableName = "question_texts", foreignKeys = {
+        @ForeignKey(entity = Question.class,
+        parentColumns = "id",
+        childColumns = "question_id")},
+indices = {@Index(value="question_id", name="question_id_index")})
 public class QuestionText {
 
     @PrimaryKey(autoGenerate = true)
-    public int id;
+    public long id;
 
-    @ForeignKey(entity = Question.class,
-                parentColumns = "id",
-                childColumns = "question_id")
-    public int questionId;
+    @ColumnInfo(name = "question_id")
+    public long questionId;
 
     public int languageId;
 

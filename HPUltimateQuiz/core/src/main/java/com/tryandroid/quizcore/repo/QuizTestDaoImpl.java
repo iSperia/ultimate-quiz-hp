@@ -28,6 +28,15 @@ public class QuizTestDaoImpl implements QuizDao {
     }
 
     @Override
+    public long insertQuestion(Question qeustion) {
+        return 0;
+    }
+
+    @Override
+    public void insertTexts(List<QuestionText> questionTexts) {
+
+    }
+
     public void insertQuestion(Question question, List<QuestionText> questionTexts) {
         final QuestionAndText questionAndText = new QuestionAndText();
         questionAndText.questionId = data.size();

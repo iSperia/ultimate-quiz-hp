@@ -12,12 +12,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import com.tryandroid.quizcore.repo.QuizDatabasePopulator;
 import com.tryandroid.quizcore.room.dao.QuizDao;
 import com.tryandroid.quizcore.room.entities.Adventure;
 import com.tryandroid.quizcore.room.entities.Question;
 import com.tryandroid.quizcore.room.entities.QuestionText;
 
-public class DatabasePopulator {
+public class DatabasePopulator implements QuizDatabasePopulator {
 
     private static final String TAG = "DatabasePopulator";
 
@@ -28,14 +29,11 @@ public class DatabasePopulator {
 
     private final Context context;
 
-    private final QuizDao dao;
-
-    public DatabasePopulator(final Context context, final QuizDao dao) {
-        this.dao = dao;
+    public DatabasePopulator(final Context context) {
         this.context = context;
     }
 
-    public void populate() {
+    public void populate(final QuizDao dao) {
         final Random random = new Random();
 
         /**
@@ -46,7 +44,7 @@ public class DatabasePopulator {
         final List<QuestionText> questionTexts = new ArrayList<>(2);
 
         try (final InputStream inputStream =
-                     context.getResources().openRawResource(tryandroid.com.hpquiz.R.raw.quest1)) {
+                     context.getResources().openRawResource(R.raw.quest1)) {
             final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
             String line = reader.readLine();
             while (line != null) {
@@ -81,7 +79,11 @@ public class DatabasePopulator {
                 questionTextEn.answer4 = columns[9];
                 questionTexts.add(questionTextEn);
 
-                dao.insertQuestion(question, questionTexts);
+                final long questionId = dao.insertQuestion(question);
+                for (final QuestionText qt : questionTexts) {
+                    qt.questionId = questionId;
+                }
+                dao.insertTexts(questionTexts);
 
                 line = reader.readLine();
             }

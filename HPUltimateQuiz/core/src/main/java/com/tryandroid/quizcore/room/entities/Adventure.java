@@ -9,7 +9,7 @@ public class Adventure {
     public static final int FAKE_ADVENTURE = 0;
 
     @PrimaryKey(autoGenerate = true)
-    public int id;
+    public long id;
 
     public Adventure(int id) {
         this.id = id;
