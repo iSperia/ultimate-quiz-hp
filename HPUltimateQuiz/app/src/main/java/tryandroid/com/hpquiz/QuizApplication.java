@@ -8,6 +8,7 @@ import android.util.Log;
 
 import tryandroid.com.quizcore.repo.QuizRepository;
 import tryandroid.com.quizcore.repo.QuizRepositoryImpl;
+import tryandroid.com.quizcore.repo.QuizRepositoryTestImpl;
 import tryandroid.com.quizcore.room.QuizDatabase;
 import tryandroid.com.quizcore.room.dao.QuestionAndText;
 import tryandroid.com.quizcore.room.entities.QuestionText;
@@ -24,8 +25,7 @@ public class QuizApplication extends Application {
 
         quizRepository = new QuizRepositoryImpl(this, dbCallback);
 
-        quizRepository.database()
-                .subscribe(this::onDatabaseAccessible);
+        quizRepository.database().subscribe(this::onDatabaseAccessible);
 
     }
 
@@ -36,7 +36,6 @@ public class QuizApplication extends Application {
 
         final QuestionAndText qt = database.quizDao().fetchQuestion(0, 0).blockingGet();
         Log.d("QuizApplication", "qt = " + qt);
-
     }
 
     private final RoomDatabase.Callback dbCallback = new RoomDatabase.Callback() {

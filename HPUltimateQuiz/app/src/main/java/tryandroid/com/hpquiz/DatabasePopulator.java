@@ -22,7 +22,7 @@ public class DatabasePopulator {
     private static final String TAG = "DatabasePopulator";
 
     public static final String QUESTIONS_CSV_FILENAME = "quest1.csv";
-    public static final String COLUMN_SEPARATOR = ",";
+    public static final String COLUMN_SEPARATOR = ";";
     public static final int COLUMN_COMPLEXITY = 10;
     private static final int GENERATION_SIZE = 1000;
 
@@ -45,11 +45,16 @@ public class DatabasePopulator {
 
         final List<QuestionText> questionTexts = new ArrayList<>(2);
 
-        try (final InputStream inputStream = context.getAssets().open(QUESTIONS_CSV_FILENAME)) {
+        try (final InputStream inputStream =
+                     context.getResources().openRawResource(R.raw.quest1)) {
             final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
             String line = reader.readLine();
             while (line != null) {
                 final String [] columns = line.split(COLUMN_SEPARATOR);
+                if (columns.length != 11) {
+                    line = reader.readLine();
+                    continue;
+                }
 
                 final Question question = new Question();
                 question.adventureId = Adventure.FAKE_ADVENTURE;
@@ -58,7 +63,7 @@ public class DatabasePopulator {
 
                 questionTexts.clear();
 
-                //Parse russian qustion text
+                //Parse russian question text
                 final QuestionText questionTextRu = new QuestionText();
                 questionTextRu.questionText = columns[0];
                 questionTextRu.answer1 = columns[2];
@@ -67,13 +72,13 @@ public class DatabasePopulator {
                 questionTextRu.answer4 = columns[8];
                 questionTexts.add(questionTextRu);
 
-                //Parse english qustion text
+                //Parse english questionText text
                 final QuestionText questionTextEn = new QuestionText();
-                questionTextRu.questionText = columns[1];
-                questionTextRu.answer1 = columns[3];
-                questionTextRu.answer2 = columns[5];
-                questionTextRu.answer3 = columns[7];
-                questionTextRu.answer4 = columns[9];
+                questionTextEn.questionText = columns[1];
+                questionTextEn.answer1 = columns[3];
+                questionTextEn.answer2 = columns[5];
+                questionTextEn.answer3 = columns[7];
+                questionTextEn.answer4 = columns[9];
                 questionTexts.add(questionTextEn);
 
                 dao.insertQuestion(question, questionTexts);
