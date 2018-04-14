@@ -11,9 +11,8 @@ import android.widget.Button;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import tryandroid.com.quizcore.quiz.QuizPresenter;
-import tryandroid.com.quizcore.quiz.QuizView;
-import tryandroid.com.quizcore.room.dao.QuestionAndText;
+import com.tryandroid.quizcore.quiz.QuizPresenter;
+import com.tryandroid.quizcore.quiz.QuizView;
 
 /**
  * Created by iSperia on 07.04.2018.
