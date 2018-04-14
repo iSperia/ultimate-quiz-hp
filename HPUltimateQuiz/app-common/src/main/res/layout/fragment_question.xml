@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/block_answers"
+        android:gravity="center"
+        tools:text = "Как называется первая книга в серии романов о Гарри Поттере?"
+        android:padding="20dp"
+        android:textSize="20sp"/>
+
+    <LinearLayout
+        android:id="@+id/block_answers"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <LinearLayout
+            android:id="@+id/button_answer_layer_top"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/btn_answer_1"
+                android:layout_width="0dp"
+                android:layout_height="72dp"
+                android:gravity="center"
+                android:layout_weight="1"
+                android:layout_margin="4dp"
+                tools:text="Гарри Поттер и Философский Камень"
+                />
+            <Button
+                android:id="@+id/btn_answer_2"
+                android:layout_width="0dp"
+                android:layout_height="72dp"
+                android:gravity="center"
+                android:layout_weight="1"
+                android:layout_margin="4dp"
+                tools:text="Гарри Поттер и Волешбный Контрабас"/>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/button_answer_layer_bottom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_answer_3"
+                android:layout_width="0dp"
+                android:layout_height="72dp"
+                android:gravity="center"
+                android:layout_weight="1"
+                android:layout_margin="4dp"
+                tools:text="Гарри Поттер и Тайная Комната"/>
+            <Button
+                android:id="@+id/btn_answer_4"
+                android:layout_width="0dp"
+                android:layout_height="72dp"
+                android:gravity="center"
+                android:layout_weight="1"
+                android:layout_margin="4dp"
+                tools:text="Гарри Поттер и Философский вопрос"/>
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>
