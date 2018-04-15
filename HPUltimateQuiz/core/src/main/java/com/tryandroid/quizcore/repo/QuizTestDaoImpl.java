@@ -57,7 +57,12 @@ public class QuizTestDaoImpl implements QuizDao {
     }
 
     @Override
-    public Single<QuestionAndText> fetchQuestion(int languageId, int adventureId) {
-        return Single.just(data.get(currentIndex++));
+    public QuestionAndText fetchQuestion(int languageId, int adventureId) {
+        return data.get(currentIndex++);
+    }
+
+    @Override
+    public Question findQuestionById(long questionId) {
+        return null;
     }
 }

@@ -34,6 +34,9 @@ public interface QuizDao {
             " AND questions.adventureId = :adventureId" +
             " ORDER BY questions.`order`" +
             " LIMIT 1")
-    Single<QuestionAndText> fetchQuestion(int languageId, int adventureId);
+    QuestionAndText fetchQuestion(int languageId, int adventureId);
+
+    @Query("SELECT * FROM questions WHERE questions.id = :questionId")
+    Question findQuestionById(long questionId);
 
 }

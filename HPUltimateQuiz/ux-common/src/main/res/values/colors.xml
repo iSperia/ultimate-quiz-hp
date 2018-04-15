@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="tint_quiz_variant_yellow">#ffefbf</color>
+    <color name="tint_quiz_variant_green">#80ff00</color>
+    <color name="tint_quiz_variant_red">#d93600</color>
+</resources>

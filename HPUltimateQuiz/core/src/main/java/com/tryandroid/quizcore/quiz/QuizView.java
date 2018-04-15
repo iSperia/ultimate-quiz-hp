@@ -12,4 +12,6 @@ public interface QuizView {
                       String answer3,
                       String answer4);
 
+    void showAnswerCorectness(boolean isCorrect);
+
 }

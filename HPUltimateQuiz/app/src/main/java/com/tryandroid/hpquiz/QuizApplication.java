@@ -36,7 +36,7 @@ public class QuizApplication extends Application implements AppContext {
             applicationPreferences.setDatabaseVersion(DatabaseVersion.V1);
         }
 
-        final QuestionAndText qt = database.quizDao().fetchQuestion(0, 0).blockingGet();
+        final QuestionAndText qt = database.quizDao().fetchQuestion(0, 0);
         Log.d("QuizApplication", "qt = " + qt.questionText);
     }
 
