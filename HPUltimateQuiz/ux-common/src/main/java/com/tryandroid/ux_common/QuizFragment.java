@@ -21,10 +21,10 @@ import com.tryandroid.quizcore.quiz.QuizView;
 public class QuizFragment extends Fragment implements QuizView {
 
     private final int [] viewIdToIndexMap = {
-            R.id.btn_answer_1,
-            R.id.btn_answer_2,
-            R.id.btn_answer_3,
-            R.id.btn_answer_4
+            R2.id.btn_answer_1,
+            R2.id.btn_answer_2,
+            R2.id.btn_answer_3,
+            R2.id.btn_answer_4
     };
 
     @BindView(R2.id.btn_answer_1)
