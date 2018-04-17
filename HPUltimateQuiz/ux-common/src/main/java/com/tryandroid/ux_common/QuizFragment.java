@@ -1,6 +1,5 @@
 package com.tryandroid.ux_common;
 
-import android.content.res.ColorStateList;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
