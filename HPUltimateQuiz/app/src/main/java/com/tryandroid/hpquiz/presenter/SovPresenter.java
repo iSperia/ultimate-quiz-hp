@@ -26,6 +26,8 @@ public class SovPresenter implements QuizPresenter {
 
     private static final String STATE_CURRENT_QUESTION = "currentQuestion";
     private static final String STATE_INDICIES = "indicies";
+    private static final String STATE_SCORE = "score";
+    private static final String STATE_QUESTION_INDEX = "question_index";
 
     private QuizView quizView;
 
@@ -38,6 +40,10 @@ public class SovPresenter implements QuizPresenter {
     private int [] indicies = new int[4];
 
     private State state = State.Default;
+
+    private int score = 0;
+
+    private int questionIndex = 0;
 
     private enum State {
         Default,
@@ -57,6 +63,11 @@ public class SovPresenter implements QuizPresenter {
         quizView.showAnswerCorectness(isAnswerCorrect);
         if (!isAnswerCorrect) {
             state = State.InvalidAnswerProvided;
+        } else {
+            final int multipler = Math.min(questionIndex / 4, 4) + 1;
+            final int scoreToAdd = currentQuestion.complexity;
+            score += scoreToAdd * multipler;
+            quizView.addScore(scoreToAdd, scoreToAdd + " X " + multipler, score);
         }
     }
 
@@ -64,18 +75,24 @@ public class SovPresenter implements QuizPresenter {
     public void save(Bundle state) {
         state.putString(STATE_CURRENT_QUESTION, new Gson().toJson(currentQuestion));
         state.putIntArray(STATE_INDICIES, indicies);
+        state.putInt(STATE_SCORE, score);
+        state.putInt(STATE_QUESTION_INDEX, questionIndex);
     }
 
     @Override
     public void restore(Bundle state) {
         currentQuestion = new Gson().fromJson(state.getString(STATE_CURRENT_QUESTION), QuestionAndText.class);
         indicies = state.getIntArray(STATE_INDICIES);
+        score = state.getInt(STATE_SCORE, 0);
+        questionIndex = state.getInt(STATE_QUESTION_INDEX, 0);
+        quizView.showScore(score);
         showQuestion(currentQuestion);
     }
 
     @Override
     public void start() {
         nextQuestion();
+        quizView.showScore(score);
     }
 
     @Override
@@ -95,6 +112,7 @@ public class SovPresenter implements QuizPresenter {
     }
 
     private void onQuestionQueryReady(final QuestionAndText qt) {
+        questionIndex++;
         currentQuestion = qt;
         resetIndicies();
         for (int i = 0; i < 5; i++) {

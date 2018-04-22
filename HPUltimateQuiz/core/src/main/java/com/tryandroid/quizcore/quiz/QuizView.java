@@ -1,5 +1,7 @@
 package com.tryandroid.quizcore.quiz;
 
+import android.support.annotation.StringRes;
+
 /**
  * Created by iSperia on 07.04.2018.
  */
@@ -14,4 +16,7 @@ public interface QuizView {
 
     void showAnswerCorectness(boolean isCorrect);
 
+    void showScore(int score);
+
+    void addScore(int count, String comment, int newScore);
 }

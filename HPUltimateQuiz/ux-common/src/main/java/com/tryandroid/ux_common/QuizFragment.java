@@ -12,8 +12,12 @@ import android.support.v4.graphics.drawable.DrawableCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
+import android.view.animation.ScaleAnimation;
+import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -55,6 +59,11 @@ public class QuizFragment extends Fragment implements QuizView {
     Button buttonAnswer4;
     @BindView(R2.id.question_text)
     TextView textQuestionBody;
+
+    @BindView(R2.id.score_comment)
+    TextView textScoreComment;
+    @BindView(R2.id.score_count_text)
+    TextView textScoreCount;
 
     private QuizPresenter presenter;
 
@@ -205,7 +214,7 @@ public class QuizFragment extends Fragment implements QuizView {
         }, 1200L);
 
         view.setBackground(blinkDrawable);
-        handler.postDelayed(() ->  blinkDrawable.clearColorFilter(), 150L);
+        handler.postDelayed(() -> blinkDrawable.clearColorFilter(), 150L);
         handler.postDelayed(() -> blinkDrawable.setColorFilter(ContextCompat.getColor(getContext(), R.color.tint_quiz_variant_yellow), PorterDuff.Mode.MULTIPLY), 250L);
         handler.postDelayed(() -> blinkDrawable.clearColorFilter(), 350L);
         handler.postDelayed(() -> blinkDrawable.setColorFilter(ContextCompat.getColor(getContext(), R.color.tint_quiz_variant_yellow), PorterDuff.Mode.MULTIPLY), 450);
@@ -224,6 +233,41 @@ public class QuizFragment extends Fragment implements QuizView {
             presenter.moveToNextQuestion();
             lockButtons(false);
         }, 800L);
+    }
+
+    @Override
+    public void showScore(int score) {
+        textScoreCount.setText(String.valueOf(score));
+    }
+
+    @Override
+    public void addScore(final int count, final String comment, final int newScore) {
+        textScoreComment.setText(comment);
+        final AnimationSet textScoreShadowAnimation = new AnimationSet(true);
+        textScoreShadowAnimation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                textScoreComment.setVisibility(View.GONE);
+                textScoreCount.setText(String.valueOf(newScore));
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        textScoreShadowAnimation.addAnimation(new TranslateAnimation(0, 0, 0, -textScoreCount.getHeight()));
+        textScoreShadowAnimation.addAnimation(new AlphaAnimation(1f, 0.4f));
+        textScoreShadowAnimation.addAnimation(new ScaleAnimation(1.1f, 0.8f, 0.8f, 1f));
+        textScoreShadowAnimation.setDuration(300);
+        textScoreComment.setVisibility(View.VISIBLE);
+        textScoreComment.startAnimation(textScoreShadowAnimation);
+
     }
 
     private void provideAnswerToPresenter(final int index) {

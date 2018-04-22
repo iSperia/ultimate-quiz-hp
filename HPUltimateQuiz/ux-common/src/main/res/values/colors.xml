@@ -3,4 +3,5 @@
     <color name="tint_quiz_variant_yellow">#ffefbf</color>
     <color name="tint_quiz_variant_green">#80ff00</color>
     <color name="tint_quiz_variant_red">#d93600</color>
+    <color name="color_1">#008c23</color>
 </resources>

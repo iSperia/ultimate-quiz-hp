@@ -7,6 +7,7 @@ public class ApplicationPreferences {
 
     private static final String PREFERENCES_SCOPE = "com.tryandroid.hpquiz.preferences";
 
+    private static final String CACHE_KEY_PREFIX = "cache.";
     private static final String APPLICATION_DATABASE_VERSION = "database.version";
 
     private final SharedPreferences sharedPreferences;
@@ -26,4 +27,13 @@ public class ApplicationPreferences {
         editor.commit();
     }
 
+    public int getCachedInt(final String key, final int defaultValue) {
+        return sharedPreferences.getInt(CACHE_KEY_PREFIX.concat(key), defaultValue);
+    }
+
+    public void setCache(final String key, final int value) {
+        final SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt(CACHE_KEY_PREFIX.concat(key), value);
+        editor.commit();
+    }
 }
