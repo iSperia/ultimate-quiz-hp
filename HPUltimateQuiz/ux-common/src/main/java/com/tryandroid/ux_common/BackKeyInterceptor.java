@@ -1,4 +1,4 @@
-package com.tryandroid.hpquiz.navigation;
+package com.tryandroid.ux_common;
 
 public interface BackKeyInterceptor {
     boolean shouldInterceptBackKey();

@@ -1,14 +1,14 @@
 package com.tryandroid.ux_common.quiz;
 
-import com.tryandroid.ux_common.LifecycleCallback;
+import com.tryandroid.ux_common.BaseViewModel;
 
 /**
  * Created by iSperia on 07.04.2018.
  */
 
-public interface QuizPresenter extends LifecycleCallback {
+public abstract class QuizPresenter extends BaseViewModel {
 
-    void onAnswerSelected(int index);
+    public abstract void onAnswerSelected(int index);
 
-    void moveToNextQuestion();
+    public abstract void moveToNextQuestion();
 }

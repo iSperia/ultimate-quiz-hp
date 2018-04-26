@@ -28,14 +28,14 @@ import com.tryandroid.ux_common.R2;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import icepick.Icepick;
+import icepick.State;
 
 /**
  * Created by iSperia on 07.04.2018.
  */
 
 public class QuizFragment extends Fragment implements QuizView {
-
-    private static final String STATE_IS_QUESTION_SHOWING = "isQuestionShowing";
 
     private final int [] viewIdToIndexMap = {
             R.id.btn_answer_1,
@@ -67,7 +67,8 @@ public class QuizFragment extends Fragment implements QuizView {
 
     private QuizPresenter presenter;
 
-    private boolean isQuestionShowing;
+    @State
+    boolean isQuestionShowing;
 
     private Handler handler;
 
@@ -109,15 +110,13 @@ public class QuizFragment extends Fragment implements QuizView {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if (savedInstanceState == null) {
-            presenter.start();
-        }
+        //TODO: observe
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        presenter.save(outState);
-        outState.putBoolean(STATE_IS_QUESTION_SHOWING, isQuestionShowing);
+        presenter.persist(outState);
+        Icepick.saveInstanceState(this, outState);
         super.onSaveInstanceState(outState);
     }
 
@@ -125,7 +124,7 @@ public class QuizFragment extends Fragment implements QuizView {
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
         if (savedInstanceState != null) {
-            isQuestionShowing = savedInstanceState.getBoolean(STATE_IS_QUESTION_SHOWING);
+            Icepick.restoreInstanceState(this, savedInstanceState);
             presenter.restore(savedInstanceState);
         }
     }

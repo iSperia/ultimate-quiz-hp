@@ -1,29 +1,41 @@
 package com.tryandroid.hpquiz;
 
 import android.app.Application;
+import android.content.res.Resources;
 import android.util.Log;
 
+import com.tryandroid.hpquiz.navigation.Router;
+import com.tryandroid.hpquiz.navigation.RouterImpl;
 import com.tryandroid.hpquiz.preferences.ApplicationPreferences;
 import com.tryandroid.hpquiz.preferences.DatabaseVersion;
+import com.tryandroid.hpquiz.presenter.MenuViewModelImpl;
 import com.tryandroid.quizcore.repo.QuizRepository;
 import com.tryandroid.quizcore.repo.QuizRepositoryImpl;
 import com.tryandroid.quizcore.room.QuizDatabase;
 import com.tryandroid.quizcore.room.dao.QuestionAndText;
+import com.tryandroid.ux_common.menu.MenuViewModel;
 
-public class QuizApplication extends Application implements AppContext {
+public class QuizApplication extends Application implements ApplicationComponents {
 
     private static final String TAG = "QuizApplication";
+
+    private static QuizApplication instance;
 
     private QuizRepository quizRepository;
 
     private ApplicationPreferences applicationPreferences;
 
+    private Router router;
+
     @Override
     public void onCreate() {
         super.onCreate();
 
+        instance = this;
+
         applicationPreferences = new ApplicationPreferences(this);
         quizRepository = new QuizRepositoryImpl(this);
+        router = new RouterImpl();
 
         quizRepository.database().subscribe(this::onDatabaseAccessible, this::onDatabaseError);
 
@@ -53,5 +65,24 @@ public class QuizApplication extends Application implements AppContext {
     @Override
     public QuizRepository repository() {
         return quizRepository;
+    }
+
+    @Override
+    public Class<? extends MenuViewModel> mainMenuViewModel() {
+        return MenuViewModelImpl.class;
+    }
+
+    @Override
+    public Resources resources() {
+        return getResources();
+    }
+
+    @Override
+    public Router router() {
+        return router;
+    }
+
+    public static ApplicationComponents $() {
+        return instance;
     }
 }

@@ -1,9 +1,11 @@
 package com.tryandroid.hpquiz.presenter;
 
 import android.os.Bundle;
+import android.support.annotation.IntDef;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.tryandroid.ux_common.bundler.QuestionAndTextBundler;
 import com.tryandroid.ux_common.quiz.QuizPresenter;
 import com.tryandroid.ux_common.quiz.QuizView;
 import com.tryandroid.quizcore.room.dao.QuestionAndText;
@@ -12,6 +14,7 @@ import com.tryandroid.quizcore.room.entities.Question;
 
 import java.util.Random;
 
+import icepick.State;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -20,35 +23,37 @@ import io.reactivex.schedulers.Schedulers;
  * Created by iSperia on 07.04.2018.
  */
 
-public class SovPresenter implements QuizPresenter {
+public class SovPresenter extends QuizPresenter {
 
     private final String TAG = "SovPresenter";
 
-    private static final String STATE_CURRENT_QUESTION = "currentQuestion";
-    private static final String STATE_INDICIES = "indicies";
-    private static final String STATE_SCORE = "score";
-    private static final String STATE_QUESTION_INDEX = "question_index";
+    @IntDef({Mode.Default, Mode.InvalidAnswerProvided})
+    public @interface Mode {
+        int Default = 0;
+        int InvalidAnswerProvided = 1;
+    }
 
     private QuizView quizView;
 
     private QuizDao dao;
 
-    private QuestionAndText currentQuestion;
+    @State(QuestionAndTextBundler.class)
+    QuestionAndText currentQuestion;
 
     private final Random random = new Random();
 
-    private int [] indicies = new int[4];
+    @State
+    int [] indicies = new int[4];
 
-    private State state = State.Default;
+    @State
+    @Mode
+    int presenterState = Mode.Default;
 
-    private int score = 0;
+    @State
+    int score = 0;
 
-    private int questionIndex = 0;
-
-    private enum State {
-        Default,
-        InvalidAnswerProvided
-    }
+    @State
+    int questionIndex = 0;
 
     public SovPresenter(final QuizView quizView,
                         final QuizDao dao) {
@@ -62,7 +67,7 @@ public class SovPresenter implements QuizPresenter {
         Log.d(TAG, "answer provided. correctness = " + isAnswerCorrect);
         quizView.showAnswerCorectness(isAnswerCorrect);
         if (!isAnswerCorrect) {
-            state = State.InvalidAnswerProvided;
+            presenterState = Mode.InvalidAnswerProvided;
         } else {
             final int multipler = Math.min(questionIndex / 4, 4) + 1;
             final int scoreToAdd = currentQuestion.complexity;
@@ -71,37 +76,12 @@ public class SovPresenter implements QuizPresenter {
         }
     }
 
-    @Override
-    public void hibernate() {
-    }
 
-    @Override
-    public void save(Bundle state) {
-        state.putString(STATE_CURRENT_QUESTION, new Gson().toJson(currentQuestion));
-        state.putIntArray(STATE_INDICIES, indicies);
-        state.putInt(STATE_SCORE, score);
-        state.putInt(STATE_QUESTION_INDEX, questionIndex);
-    }
 
-    @Override
-    public void restore(Bundle state) {
-        currentQuestion = new Gson().fromJson(state.getString(STATE_CURRENT_QUESTION), QuestionAndText.class);
-        indicies = state.getIntArray(STATE_INDICIES);
-        score = state.getInt(STATE_SCORE, 0);
-        questionIndex = state.getInt(STATE_QUESTION_INDEX, 0);
-        quizView.showScore(score);
-        showQuestion(currentQuestion);
-    }
-
-    @Override
-    public void start() {
-        nextQuestion();
-        quizView.showScore(score);
-    }
 
     @Override
     public void moveToNextQuestion() {
-        if (state == State.Default) {
+        if (presenterState == Mode.Default) {
             nextQuestion();
         }
     }
