@@ -1,4 +1,4 @@
-package com.tryandroid.ux_common;
+package com.tryandroid.ux_common.quiz;
 
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -22,12 +22,12 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.tryandroid.ux_common.R;
+import com.tryandroid.ux_common.R2;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-
-import com.tryandroid.quizcore.quiz.QuizPresenter;
-import com.tryandroid.quizcore.quiz.QuizView;
 
 /**
  * Created by iSperia on 07.04.2018.

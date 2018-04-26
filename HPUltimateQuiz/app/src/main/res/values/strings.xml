@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">HP Ultimate Quiz</string>
+    <string name="menu_exams">Start exam</string>
+    <string name="menu_exams_sov">O.W.L.</string>
 </resources>

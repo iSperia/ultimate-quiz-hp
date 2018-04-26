@@ -1,6 +1,4 @@
-package com.tryandroid.quizcore.quiz;
-
-import android.support.annotation.StringRes;
+package com.tryandroid.ux_common.quiz;
 
 /**
  * Created by iSperia on 07.04.2018.

@@ -4,8 +4,8 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.google.gson.Gson;
-import com.tryandroid.quizcore.quiz.QuizPresenter;
-import com.tryandroid.quizcore.quiz.QuizView;
+import com.tryandroid.ux_common.quiz.QuizPresenter;
+import com.tryandroid.ux_common.quiz.QuizView;
 import com.tryandroid.quizcore.room.dao.QuestionAndText;
 import com.tryandroid.quizcore.room.dao.QuizDao;
 import com.tryandroid.quizcore.room.entities.Question;
@@ -69,6 +69,10 @@ public class SovPresenter implements QuizPresenter {
             score += scoreToAdd * multipler;
             quizView.addScore(scoreToAdd, scoreToAdd + " X " + multipler, score);
         }
+    }
+
+    @Override
+    public void hibernate() {
     }
 
     @Override
