@@ -9,7 +9,7 @@ import java.util.List;
 
 public abstract class MenuViewModel extends BaseViewModel implements BackKeyInterceptor {
 
-    public abstract LiveData<List<String>> getItemsData();
+    public abstract LiveData<List<String>> observeMenuItems();
 
     public abstract void handleMenuItemClick(int menuItemPosition);
 }

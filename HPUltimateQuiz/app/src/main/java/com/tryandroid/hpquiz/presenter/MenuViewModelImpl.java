@@ -7,7 +7,6 @@ import android.support.annotation.IntDef;
 
 import com.tryandroid.hpquiz.QuizApplication;
 import com.tryandroid.hpquiz.R;
-import com.tryandroid.ux_common.BackKeyInterceptor;
 import com.tryandroid.hpquiz.navigation.Router;
 import com.tryandroid.ux_common.menu.MenuViewModel;
 
@@ -64,6 +63,11 @@ public class MenuViewModelImpl extends MenuViewModel {
     }
 
     @Override
+    public void start() {
+
+    }
+
+    @Override
     public boolean shouldInterceptBackKey() {
         switch (mode) {
             case Mode.ShowExam:
@@ -74,7 +78,7 @@ public class MenuViewModelImpl extends MenuViewModel {
     }
 
     @Override
-    public LiveData<List<String>> getItemsData() {
+    public LiveData<List<String>> observeMenuItems() {
         return itemsLiveData;
     }
 

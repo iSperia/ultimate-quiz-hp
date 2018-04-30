@@ -18,6 +18,8 @@ public abstract class BaseViewModel extends ViewModel {
         }
     }
 
+    public abstract void start();
+
     public boolean shouldInterceptBackKey() {
         return false;
     }

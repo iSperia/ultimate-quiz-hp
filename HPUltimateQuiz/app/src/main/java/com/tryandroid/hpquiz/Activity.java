@@ -12,7 +12,6 @@ import com.tryandroid.hpquiz.presenter.MenuViewModelImpl;
 import com.tryandroid.hpquiz.presenter.SovPresenter;
 import com.tryandroid.ux_common.menu.MainMenuFragment;
 import com.tryandroid.ux_common.quiz.QuizPresenter;
-import com.tryandroid.ux_common.quiz.QuizView;
 import com.tryandroid.quizcore.room.dao.QuizDao;
 import com.tryandroid.ux_common.quiz.QuizFragment;
 
@@ -46,13 +45,13 @@ public class Activity extends AppCompatActivity implements QuizFragment.Provider
     }
 
     @Override
-    public QuizPresenter provideQuizPresenter(final QuizView view) {
+    public QuizPresenter provideQuizPresenter() {
         final QuizDao dao = ((ApplicationComponents) getApplication())
                 .repository()
                 .database()
                 .blockingFirst()
                 .quizDao();
-        return new SovPresenter(view, dao);
+        return new SovPresenter(dao);
     }
 
     @Override

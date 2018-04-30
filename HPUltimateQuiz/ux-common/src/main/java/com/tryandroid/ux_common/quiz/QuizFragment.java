@@ -35,7 +35,7 @@ import icepick.State;
  * Created by iSperia on 07.04.2018.
  */
 
-public class QuizFragment extends Fragment implements QuizView {
+public class QuizFragment extends Fragment {
 
     private final int [] viewIdToIndexMap = {
             R.id.btn_answer_1,
@@ -89,8 +89,12 @@ public class QuizFragment extends Fragment implements QuizView {
         ButterKnife.bind(this, result);
 
         final Providers components = (Providers) getActivity();
-        presenter = components.provideQuizPresenter(this);
+        presenter = components.provideQuizPresenter();
 
+        presenter.observeCorectness().observe(this, this::showAnswerCorectness);
+        presenter.observeQuestion().observe(this, this::showQuestion);
+        presenter.observeScore().observe(this, this::showScore);
+        presenter.observeScoreAdditions().observe(this, this::addScore);
         return result;
     }
 
@@ -126,16 +130,17 @@ public class QuizFragment extends Fragment implements QuizView {
         if (savedInstanceState != null) {
             Icepick.restoreInstanceState(this, savedInstanceState);
             presenter.restore(savedInstanceState);
+        } else {
+            presenter.start();
         }
     }
 
-    @Override
-    public void showQuestion(String questionText, String a1, String a2, String a3, String a4) {
-        this.questionText = questionText;
-        this.answer1 = a1;
-        this.answer2 = a2;
-        this.answer3 = a3;
-        this.answer4 = a4;
+    public void showQuestion(final QuizPresenter.QuestionViewModel questionViewModel) {
+        this.questionText = questionViewModel.getQuestion();
+        this.answer1 = questionViewModel.getAnswer1();
+        this.answer2 = questionViewModel.getAnswer2();
+        this.answer3 = questionViewModel.getAnswer3();
+        this.answer4 = questionViewModel.getAnswer4();
 
         if (isQuestionShowing) {
             hideQuestionAnswers(this::showQuestionAnswers);
@@ -219,8 +224,7 @@ public class QuizFragment extends Fragment implements QuizView {
         handler.postDelayed(() -> blinkDrawable.setColorFilter(ContextCompat.getColor(getContext(), R.color.tint_quiz_variant_yellow), PorterDuff.Mode.MULTIPLY), 450);
     }
 
-    @Override
-    public void showAnswerCorectness(boolean isCorrect) {
+    public void showAnswerCorectness(final Boolean isCorrect) {
         final Drawable nowDrawable = clickedAnswerButton.getBackground();
         nowDrawable.setColorFilter(ContextCompat.getColor(getContext(), isCorrect ? R.color.tint_quiz_variant_green : R.color.tint_quiz_variant_red), PorterDuff.Mode.MULTIPLY);
 
@@ -234,14 +238,12 @@ public class QuizFragment extends Fragment implements QuizView {
         }, 800L);
     }
 
-    @Override
-    public void showScore(int score) {
+    public void showScore(final Integer score) {
         textScoreCount.setText(String.valueOf(score));
     }
 
-    @Override
-    public void addScore(final int count, final String comment, final int newScore) {
-        textScoreComment.setText(comment);
+    public void addScore(final QuizPresenter.ScoreAddViewModel scoreAddViewModel) {
+        textScoreComment.setText(scoreAddViewModel.getCount() + scoreAddViewModel.getComment());
         final AnimationSet textScoreShadowAnimation = new AnimationSet(true);
         textScoreShadowAnimation.setAnimationListener(new Animation.AnimationListener() {
             @Override
@@ -252,7 +254,6 @@ public class QuizFragment extends Fragment implements QuizView {
             @Override
             public void onAnimationEnd(Animation animation) {
                 textScoreComment.setVisibility(View.GONE);
-                textScoreCount.setText(String.valueOf(newScore));
             }
 
             @Override
@@ -288,6 +289,6 @@ public class QuizFragment extends Fragment implements QuizView {
     }
 
     public interface Providers {
-        QuizPresenter provideQuizPresenter(QuizView view);
+        QuizPresenter provideQuizPresenter();
     }
 }

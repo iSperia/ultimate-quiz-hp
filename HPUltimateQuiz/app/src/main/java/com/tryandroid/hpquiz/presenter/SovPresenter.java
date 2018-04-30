@@ -1,5 +1,7 @@
 package com.tryandroid.hpquiz.presenter;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.os.Bundle;
 import android.support.annotation.IntDef;
 import android.util.Log;
@@ -7,7 +9,6 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.tryandroid.ux_common.bundler.QuestionAndTextBundler;
 import com.tryandroid.ux_common.quiz.QuizPresenter;
-import com.tryandroid.ux_common.quiz.QuizView;
 import com.tryandroid.quizcore.room.dao.QuestionAndText;
 import com.tryandroid.quizcore.room.dao.QuizDao;
 import com.tryandroid.quizcore.room.entities.Question;
@@ -33,8 +34,6 @@ public class SovPresenter extends QuizPresenter {
         int InvalidAnswerProvided = 1;
     }
 
-    private QuizView quizView;
-
     private QuizDao dao;
 
     @State(QuestionAndTextBundler.class)
@@ -55,35 +54,66 @@ public class SovPresenter extends QuizPresenter {
     @State
     int questionIndex = 0;
 
-    public SovPresenter(final QuizView quizView,
-                        final QuizDao dao) {
-        this.quizView = quizView;
+    public SovPresenter(final QuizDao dao) {
         this.dao = dao;
     }
+
+    private final MutableLiveData<Boolean> answerCorectnessObservable = new MutableLiveData<>();
+
+    private final MutableLiveData<ScoreAddViewModel> scoreAddObservable = new MutableLiveData<>();
+
+    private final MutableLiveData<Integer> scoreObservable = new MutableLiveData<>();
+
+    private final MutableLiveData<QuestionViewModel> questionObservable = new MutableLiveData<>();
 
     @Override
     public void onAnswerSelected(final int index) {
         final boolean isAnswerCorrect = indicies[index] == 0;
         Log.d(TAG, "answer provided. correctness = " + isAnswerCorrect);
-        quizView.showAnswerCorectness(isAnswerCorrect);
+        answerCorectnessObservable.postValue(isAnswerCorrect);
         if (!isAnswerCorrect) {
             presenterState = Mode.InvalidAnswerProvided;
         } else {
             final int multipler = Math.min(questionIndex / 4, 4) + 1;
             final int scoreToAdd = currentQuestion.complexity;
             score += scoreToAdd * multipler;
-            quizView.addScore(scoreToAdd, scoreToAdd + " X " + multipler, score);
+            scoreAddObservable.postValue(new ScoreAddViewModel(scoreToAdd,
+                    " X " + multipler));
+            scoreObservable.postValue(score);
         }
     }
-
-
-
 
     @Override
     public void moveToNextQuestion() {
         if (presenterState == Mode.Default) {
             nextQuestion();
         }
+    }
+
+    @Override
+    public void start() {
+        moveToNextQuestion();
+        scoreObservable.postValue(score);
+    }
+
+    @Override
+    public LiveData<QuestionViewModel> observeQuestion() {
+        return questionObservable;
+    }
+
+    @Override
+    public LiveData<Boolean> observeCorectness() {
+        return answerCorectnessObservable;
+    }
+
+    @Override
+    public LiveData<Integer> observeScore() {
+        return scoreObservable;
+    }
+
+    @Override
+    public LiveData<ScoreAddViewModel> observeScoreAdditions() {
+        return scoreAddObservable;
     }
 
     private void nextQuestion() {
@@ -117,11 +147,12 @@ public class SovPresenter extends QuizPresenter {
     }
 
     private void showQuestion(final QuestionAndText qt) {
-        quizView.showQuestion(currentQuestion.questionText,
+        questionObservable.postValue(new QuestionViewModel(
+                currentQuestion.questionText,
                 extractAnswerByIndex(indicies[0]),
                 extractAnswerByIndex(indicies[1]),
                 extractAnswerByIndex(indicies[2]),
-                extractAnswerByIndex(indicies[3]));
+                extractAnswerByIndex(indicies[3])));
     }
 
     private void resetIndicies() {

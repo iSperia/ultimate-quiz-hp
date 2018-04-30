@@ -72,7 +72,7 @@ public class MainMenuFragment extends Fragment implements BackKeyInterceptor {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        menuViewModel.getItemsData().observe(this, this::showMenuItems);
+        menuViewModel.observeMenuItems().observe(this, this::showMenuItems);
     }
 
     @Override
