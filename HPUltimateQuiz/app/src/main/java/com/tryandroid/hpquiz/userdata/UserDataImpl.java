@@ -14,10 +14,18 @@ public class UserDataImpl implements UserData {
     private static final String KEY_FLASH = "flash";
     private static final String KEY_FLASH_DELTA = "flash.delta";
 
+    private static final String IS_START_TIPS_GIVEN = "tips.given";
+
     private ApplicationPreferences prefs;
 
     public UserDataImpl(final ApplicationPreferences prefs) {
         this.prefs = prefs;
+        if (prefs.getCachedInt(IS_START_TIPS_GIVEN, 0) == 0) {
+            addTip(TipType.Wand, 5);
+            addTip(TipType.Cloak, 5);
+            addTip(TipType.Stone, 5);
+            prefs.setCache(IS_START_TIPS_GIVEN, 1);
+        }
     }
 
     @Override
@@ -53,8 +61,7 @@ public class UserDataImpl implements UserData {
 
     @Override
     public void addTip(TipType tipType, int count) {
-        prefs.setCache(tipType.toString().concat(".delta"),
-                prefs.getCachedInt(tipType.toString(), 0) +
+        prefs.setCache(tipType.toString().concat(".delta"), count +
                         prefs.getCachedInt(tipType.toString().concat(".delta"), 0));
         applyOperationsAfterSync();
     }
@@ -88,11 +95,11 @@ public class UserDataImpl implements UserData {
         }).andThen(
                 Observable.fromArray(TipType.values())
                         .doOnNext(tipType -> {
-                            final String keyDelta = tipType.toString().concat("delta");
+                            final String keyDelta = tipType.toString().concat(".delta");
                             final int nowTips = prefs.getCachedInt(tipType.toString(), 0);
                             final int deltaTips = prefs.getCachedInt(keyDelta, 0);
                             prefs.setCache(tipType.toString(), deltaTips + nowTips);
-                            prefs.setCache(tipType.toString().concat("delta"), 0);
+                            prefs.setCache(tipType.toString().concat(".delta"), 0);
                         }).ignoreElements());
     }
 }

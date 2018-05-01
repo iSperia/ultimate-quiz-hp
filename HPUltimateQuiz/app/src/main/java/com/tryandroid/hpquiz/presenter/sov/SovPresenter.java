@@ -1,18 +1,22 @@
-package com.tryandroid.hpquiz.presenter;
+package com.tryandroid.hpquiz.presenter.sov;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
-import android.os.Bundle;
+import android.content.res.Resources;
 import android.support.annotation.IntDef;
 import android.util.Log;
 
-import com.google.gson.Gson;
+import com.tryandroid.hpquiz.R;
+import com.tryandroid.hpquiz.userdata.TipType;
+import com.tryandroid.hpquiz.userdata.UserData;
 import com.tryandroid.ux_common.bundler.QuestionAndTextBundler;
 import com.tryandroid.ux_common.quiz.QuizPresenter;
 import com.tryandroid.quizcore.room.dao.QuestionAndText;
 import com.tryandroid.quizcore.room.dao.QuizDao;
 import com.tryandroid.quizcore.room.entities.Question;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import icepick.State;
@@ -32,9 +36,14 @@ public class SovPresenter extends QuizPresenter {
     public @interface Mode {
         int Default = 0;
         int InvalidAnswerProvided = 1;
+        int Ressurected = 2;
     }
 
     private QuizDao dao;
+
+    private UserData userData;
+
+    private final Resources resources;
 
     @State(QuestionAndTextBundler.class)
     QuestionAndText currentQuestion;
@@ -54,8 +63,16 @@ public class SovPresenter extends QuizPresenter {
     @State
     int questionIndex = 0;
 
-    public SovPresenter(final QuizDao dao) {
+    @State(CloakTipState.Bundler.class)
+    CloakTipState cloakTipState = new CloakTipState();
+
+    @State(StoneTipState.Bundler.class)
+    StoneTipState stoneTipState = new StoneTipState();
+
+    public SovPresenter(final Resources resources, final QuizDao dao, final UserData userData) {
         this.dao = dao;
+        this.userData = userData;
+        this.resources = resources;
     }
 
     private final MutableLiveData<Boolean> answerCorectnessObservable = new MutableLiveData<>();
@@ -66,13 +83,24 @@ public class SovPresenter extends QuizPresenter {
 
     private final MutableLiveData<QuestionViewModel> questionObservable = new MutableLiveData<>();
 
+    private final MutableLiveData<List<TipInfo>> tipInfoObservable = new MutableLiveData<>();
+
+    private final MutableLiveData<HiddenAnswerInfo> hiddenAnswersObservable = new MutableLiveData<>();
+
+    private final MutableLiveData<GlobalEffectInfo> globalEffectInfoMutableLiveData = new MutableLiveData<>();
+
     @Override
     public void onAnswerSelected(final int index) {
         final boolean isAnswerCorrect = indicies[index] == 0;
         Log.d(TAG, "answer provided. correctness = " + isAnswerCorrect);
         answerCorectnessObservable.postValue(isAnswerCorrect);
         if (!isAnswerCorrect) {
-            presenterState = Mode.InvalidAnswerProvided;
+            if (stoneTipState.isProtected) {
+                stoneTipState.reset();
+                presenterState = Mode.Ressurected;
+            } else {
+                presenterState = Mode.InvalidAnswerProvided;
+            }
         } else {
             final int multipler = Math.min(questionIndex / 4, 4) + 1;
             final int scoreToAdd = currentQuestion.complexity;
@@ -87,18 +115,101 @@ public class SovPresenter extends QuizPresenter {
     public void moveToNextQuestion() {
         if (presenterState == Mode.Default) {
             nextQuestion();
+
+            cloakTipState.reset();
+            emitCloakData();
+
+            stoneTipState.reset();
+            emitStoneData();
+        } else if (presenterState == Mode.Ressurected) {
+            presenterState = Mode.Default;
+            emitStoneData();
         }
+    }
+
+    @Override
+    public void useTip(TipInfo tipInfo) {
+        final TipType token = (TipType) tipInfo.getToken();
+        final int count = userData.getTipCount(token);
+        if (count > 0) {
+            switch (token) {
+                case Cloak:
+                    if (!cloakTipState.isCloakUsed) {
+                        //hide two variants
+                        cloakTipState.hide(getRightIndex());
+                        emitCloakData();
+                        userData.spendTip(TipType.Cloak);
+                    }
+                    break;
+                case Wand:
+                    moveToNextQuestion();
+                    userData.spendTip(TipType.Wand);
+                    emitTipInfo();
+                    break;
+                case Stone:
+                    userData.spendTip(TipType.Stone);
+                    emitTipInfo();
+                    stoneTipState.startProtection();
+                    emitStoneData();
+                    break;
+            }
+            emitTipInfo();
+        }
+    }
+
+    private int getRightIndex() {
+        for (int i = 0; i < indicies.length; i++) {
+            if (indicies[i] == 0) return i;
+        }
+        return 0;
     }
 
     @Override
     public void start() {
         moveToNextQuestion();
         scoreObservable.postValue(score);
+        emitTipInfo();
+    }
+
+    private void emitTipInfo() {
+        final List<TipInfo> tipInfos = new ArrayList<>(3);
+        tipInfos.add(new TipInfo(resources.getString(R.string.tip_wand_name), 0, userData.getTipCount(TipType.Wand), TipType.Wand));
+        tipInfos.add(new TipInfo(resources.getString(R.string.tip_cloak_name), 0, userData.getTipCount(TipType.Cloak), TipType.Cloak));
+        tipInfos.add(new TipInfo(resources.getString(R.string.tip_stone_name), 0, userData.getTipCount(TipType.Stone), TipType.Stone));
+        tipInfoObservable.postValue(tipInfos);
+    }
+
+    private void emitCloakData() {
+        if (cloakTipState.isCloakUsed) {
+            hiddenAnswersObservable.postValue(new HiddenAnswerInfo(
+                    cloakTipState.idx1, cloakTipState.idx2));
+        } else {
+            hiddenAnswersObservable.postValue(new HiddenAnswerInfo());
+        }
+    }
+
+    private void emitStoneData() {
+        if (stoneTipState.isProtected) {
+            globalEffectInfoMutableLiveData.postValue(
+                    new GlobalEffectInfo(resources.getString(R.string.effect_stone_description)));
+        } else {
+            globalEffectInfoMutableLiveData.postValue(null);
+        }
     }
 
     @Override
     public LiveData<QuestionViewModel> observeQuestion() {
         return questionObservable;
+    }
+
+    @Override
+    public LiveData<HiddenAnswerInfo> observeHiddenAnswers() {
+        return hiddenAnswersObservable;
+    }
+
+    @Override
+    public LiveData<List<TipInfo>> observeTipInfo() {
+        return tipInfoObservable;
     }
 
     @Override
@@ -114,6 +225,11 @@ public class SovPresenter extends QuizPresenter {
     @Override
     public LiveData<ScoreAddViewModel> observeScoreAdditions() {
         return scoreAddObservable;
+    }
+
+    @Override
+    public LiveData<GlobalEffectInfo> observeGlobalEffects() {
+        return globalEffectInfoMutableLiveData;
     }
 
     private void nextQuestion() {

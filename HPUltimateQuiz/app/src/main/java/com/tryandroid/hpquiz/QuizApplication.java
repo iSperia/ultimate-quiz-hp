@@ -9,11 +9,15 @@ import com.tryandroid.hpquiz.navigation.RouterImpl;
 import com.tryandroid.hpquiz.preferences.ApplicationPreferences;
 import com.tryandroid.hpquiz.preferences.DatabaseVersion;
 import com.tryandroid.hpquiz.presenter.MenuViewModelImpl;
+import com.tryandroid.hpquiz.userdata.UserData;
+import com.tryandroid.hpquiz.userdata.UserDataImpl;
 import com.tryandroid.quizcore.repo.QuizRepository;
 import com.tryandroid.quizcore.repo.QuizRepositoryImpl;
 import com.tryandroid.quizcore.room.QuizDatabase;
 import com.tryandroid.quizcore.room.dao.QuestionAndText;
 import com.tryandroid.ux_common.menu.MenuViewModel;
+
+import io.reactivex.schedulers.Schedulers;
 
 public class QuizApplication extends Application implements ApplicationComponents {
 
@@ -24,6 +28,8 @@ public class QuizApplication extends Application implements ApplicationComponent
     private QuizRepository quizRepository;
 
     private ApplicationPreferences applicationPreferences;
+
+    private UserData userData;
 
     private Router router;
 
@@ -36,8 +42,9 @@ public class QuizApplication extends Application implements ApplicationComponent
         applicationPreferences = new ApplicationPreferences(this);
         quizRepository = new QuizRepositoryImpl(this);
         router = new RouterImpl();
+        userData = new UserDataImpl(applicationPreferences);
 
-        quizRepository.database().subscribe(this::onDatabaseAccessible, this::onDatabaseError);
+        quizRepository.database().observeOn(Schedulers.io()).subscribe(this::onDatabaseAccessible, this::onDatabaseError);
 
     }
 
@@ -80,6 +87,11 @@ public class QuizApplication extends Application implements ApplicationComponent
     @Override
     public Router router() {
         return router;
+    }
+
+    @Override
+    public UserData userData() {
+        return userData;
     }
 
     public static ApplicationComponents $() {

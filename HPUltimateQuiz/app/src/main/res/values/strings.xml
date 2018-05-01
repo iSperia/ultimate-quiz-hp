@@ -2,4 +2,10 @@
     <string name="app_name">HP Ultimate Quiz</string>
     <string name="menu_exams">Start exam</string>
     <string name="menu_exams_sov">O.W.L.</string>
+
+    <string name="tip_cloak_name">Cloak</string>
+    <string name="tip_stone_name">Stone</string>
+    <string name="tip_wand_name">Wand</string>
+
+    <string name="effect_stone_description">Stone of ressurection is activated</string>
 </resources>

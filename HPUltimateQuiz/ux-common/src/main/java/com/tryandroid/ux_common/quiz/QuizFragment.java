@@ -25,6 +25,8 @@ import android.widget.TextView;
 import com.tryandroid.ux_common.R;
 import com.tryandroid.ux_common.R2;
 
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -64,6 +66,10 @@ public class QuizFragment extends Fragment {
     TextView textScoreComment;
     @BindView(R2.id.score_count_text)
     TextView textScoreCount;
+    @BindView(R2.id.text_global_effect)
+    TextView textGlobalEffect;
+    @BindView(R2.id.block_tips_buttons)
+    LinearLayout blockTips;
 
     private QuizPresenter presenter;
 
@@ -95,6 +101,10 @@ public class QuizFragment extends Fragment {
         presenter.observeQuestion().observe(this, this::showQuestion);
         presenter.observeScore().observe(this, this::showScore);
         presenter.observeScoreAdditions().observe(this, this::addScore);
+        presenter.observeTipInfo().observe(this, this::showTips);
+        presenter.observeHiddenAnswers().observe(this, this::hideAnswers);
+        presenter.observeGlobalEffects().observe(this, this::showGlobalEffects);
+
         return result;
     }
 
@@ -234,6 +244,10 @@ public class QuizFragment extends Fragment {
             }
             clickedAnswerButton.setBackground(nowDrawable);
             presenter.moveToNextQuestion();
+            final Button [] buttons = {buttonAnswer1, buttonAnswer2, buttonAnswer3, buttonAnswer4};
+            for (final Button button : buttons) {
+                button.getBackground().setColorFilter(null);
+            }
             lockButtons(false);
         }, 800L);
     }
@@ -267,7 +281,37 @@ public class QuizFragment extends Fragment {
         textScoreShadowAnimation.setDuration(300);
         textScoreComment.setVisibility(View.VISIBLE);
         textScoreComment.startAnimation(textScoreShadowAnimation);
+    }
 
+    public void hideAnswers(final QuizPresenter.HiddenAnswerInfo hiddenAnswerInfo) {
+        buttonAnswer1.setVisibility(!hiddenAnswerInfo.isHidden(0) ? View.VISIBLE : View.INVISIBLE);
+        buttonAnswer2.setVisibility(!hiddenAnswerInfo.isHidden(1) ? View.VISIBLE : View.INVISIBLE);
+        buttonAnswer3.setVisibility(!hiddenAnswerInfo.isHidden(2) ? View.VISIBLE : View.INVISIBLE);
+        buttonAnswer4.setVisibility(!hiddenAnswerInfo.isHidden(3) ? View.VISIBLE : View.INVISIBLE);
+    }
+
+    public void showGlobalEffects(final QuizPresenter.GlobalEffectInfo info) {
+        if (info == null) {
+            textGlobalEffect.setVisibility(View.GONE);
+        } else {
+            textGlobalEffect.setVisibility(View.VISIBLE);
+            textGlobalEffect.setText(info.getEffectName());
+        }
+    }
+
+    public void showTips(final List<QuizPresenter.TipInfo> tipInfos) {
+        blockTips.removeAllViews();
+        for (final QuizPresenter.TipInfo tipInfo : tipInfos) {
+            final View tipView = getLayoutInflater().inflate(R.layout.block_tip, blockTips, false);
+            final Button buttonTipName = tipView.findViewById(R.id.text_tip_name);
+            buttonTipName.setText(tipInfo.getName() + " (" + tipInfo.getCount() + ")");
+            buttonTipName.setOnClickListener(view -> {
+                if (tipInfo.getCount() > 0) {
+                    presenter.useTip(tipInfo);
+                }
+            });
+            blockTips.addView(tipView);
+        }
     }
 
     private void provideAnswerToPresenter(final int index) {

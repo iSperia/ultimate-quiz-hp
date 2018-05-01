@@ -4,6 +4,7 @@ import android.content.res.Resources;
 
 import com.tryandroid.hpquiz.navigation.Router;
 import com.tryandroid.hpquiz.preferences.ApplicationPreferences;
+import com.tryandroid.hpquiz.userdata.UserData;
 import com.tryandroid.quizcore.repo.QuizRepository;
 import com.tryandroid.ux_common.menu.MenuViewModel;
 
@@ -18,4 +19,6 @@ public interface ApplicationComponents {
     Resources resources();
 
     Router router();
+
+    UserData userData();
 }

@@ -42,11 +42,38 @@
         android:id="@+id/question_text"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/block_answers"
+        android:layout_above="@+id/block_tips"
         android:gravity="center"
         tools:text = "Как называется первая книга в серии романов о Гарри Поттере?"
         android:padding="20dp"
         android:textSize="20sp"/>
+
+    <LinearLayout
+        android:id="@+id/block_tips"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_above="@+id/block_answers">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/text_global_effect"
+            android:visibility="gone"/>
+
+        <LinearLayout
+            android:id="@+id/block_tips_buttons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
 
     <LinearLayout
         android:id="@+id/block_answers"

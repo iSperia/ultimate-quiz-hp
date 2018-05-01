@@ -9,7 +9,7 @@ import com.tryandroid.ux_common.BackKeyInterceptor;
 import com.tryandroid.hpquiz.navigation.Router;
 import com.tryandroid.hpquiz.navigation.RouterImpl;
 import com.tryandroid.hpquiz.presenter.MenuViewModelImpl;
-import com.tryandroid.hpquiz.presenter.SovPresenter;
+import com.tryandroid.hpquiz.presenter.sov.SovPresenter;
 import com.tryandroid.ux_common.menu.MainMenuFragment;
 import com.tryandroid.ux_common.quiz.QuizPresenter;
 import com.tryandroid.quizcore.room.dao.QuizDao;
@@ -46,12 +46,13 @@ public class Activity extends AppCompatActivity implements QuizFragment.Provider
 
     @Override
     public QuizPresenter provideQuizPresenter() {
-        final QuizDao dao = ((ApplicationComponents) getApplication())
+        final ApplicationComponents components = (ApplicationComponents) getApplication();
+        final QuizDao dao = components
                 .repository()
                 .database()
                 .blockingFirst()
                 .quizDao();
-        return new SovPresenter(dao);
+        return new SovPresenter(getResources(), dao, components.userData());
     }
 
     @Override
